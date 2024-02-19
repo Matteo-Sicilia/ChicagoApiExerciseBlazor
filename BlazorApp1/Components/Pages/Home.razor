@@ -1,0 +1,79 @@
+﻿@page "/"
+
+
+<PageTitle>Home</PageTitle>
+
+<h1>Artworks</h1>
+
+
+
+<table>
+    <tr>    
+        <th>Nome</th>
+        <th>Description</th>
+        <th>Dimensions</th>
+        <th>Artists</th>
+        <th>Image</th>
+    </tr>
+
+        @foreach(var item in list)
+        {
+
+        <tr>
+            <td>@item.Title</td>
+            <td>@item.Description</td>
+            <td>@item.Dimensions</td>   
+            <td>@item.ArtistDisplay</td>
+            <td><img width="200" height="400" src="@item.ImageUrl" /></td>
+
+
+        </tr>
+        }
+    
+
+</table>
+
+
+
+@code
+{
+    private List<Artwork> list = new List<Artwork>();
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        HttpClient client = new HttpClient();
+        var response = await client.GetFromJsonAsync<Response>("https://api.artic.edu/api/v1/artworks");
+
+        foreach (var artwork in response.Data)
+        {
+            Artwork artworkInfo = new Artwork();
+            artworkInfo.Id = artwork.Id;
+            artworkInfo.ArtworkImage = artwork.ImageId;
+            artworkInfo.Title = artwork.Title;
+            artworkInfo.ArtistDisplay = artwork.ArtistDisplay;
+            artworkInfo.DateDisplay = artwork.DateDisplay;
+            artworkInfo.Description = artwork.Description;
+            artworkInfo.PlaceOfOrigin = artwork.PlaceOfOrigin;
+            artworkInfo.Dimensions = artwork.Dimensions;
+            artworkInfo.ImageUrl = $"https://www.artic.edu/iiif/2/{artworkInfo.ArtworkImage}/full/843,1000/0/default.jpg";
+            list.Add(artworkInfo);
+        }
+
+    }
+
+    public class Artwork
+    {
+        public int Id { get; set; }
+        public string ArtworkImage { get; set; }
+        public string Title { get; set; }
+        public string ArtistDisplay { get; set; }
+        public string DateDisplay { get; set; }
+        public string Description { get; set; }
+        public string PlaceOfOrigin { get; set; }
+        public string Dimensions { get; set; }
+        public string OnLoanDisplay { get; set; }
+        public string ImageUrl { get; set; }
+    }
+
+}
